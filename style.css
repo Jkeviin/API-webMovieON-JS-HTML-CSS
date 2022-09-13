@@ -1,0 +1,201 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body{
+  position: relative;
+}
+
+header{
+  width: 100%;
+  height: 125px;
+  background-color: #141a32;
+  display: flex;
+  justify-content: space-around;
+  color: white;
+  font-size: 22pt;
+  align-items: center;
+  z-index: 20;
+}
+
+header>h1{
+  cursor: default;
+}
+
+header>a{
+  text-decoration: none;
+  color: white;
+}
+
+header>a:hover{
+  color: #ffe100;
+}
+
+.active {
+  color: #ffe100;
+}
+
+header>hr{
+  height: 40px;
+}
+
+header> .filterSearch{
+  width: 200px;
+  height: 50px;
+  position: relative;
+  border: 1px solid gray;
+  border-radius: 20px;
+  background-color: rgba(137, 137, 137, 0.443);
+}
+
+.filterSearch>i{
+  position: absolute;
+  transform: translateX(-50%) translateY(-50%);
+  top: 50%;
+  left: 10%;
+  font-size: 12pt;
+  cursor: pointer;
+}
+
+.filterSearch>input{
+  width: 80%;
+  height: 100%;
+  position: absolute;
+  left: 40px;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  color: white;
+  font-size: 15pt;
+}
+
+main{
+  display: flex;
+  top: 125px;
+  width: 100%;
+}
+
+.sectionFilter{
+  color: white;
+}
+
+.genderFilter{
+  width: 100%;
+  margin: 30px;
+}
+
+.genderFilter>h3{
+  font-size: 19pt;
+}
+
+.genderFilter>li{
+  width: auto;
+  font-size: 14pt;
+  margin: 5px 20px;
+}
+
+.genderFilter>li{
+  width: auto;
+  font-size: 14pt;
+  margin: 20px 20px;
+  color: #cccccc;
+}
+
+.genderFilter>li:hover{
+  cursor: pointer;
+}
+
+.yearFilter{
+  width: 100%;
+  margin: 30px;
+}
+
+.yearFilter .yearsList{
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+}
+
+.yearFilter>h3{
+  font-size: 19pt;
+}
+
+.yearsList>li{
+  width: auto;
+  font-size: 14pt;
+  margin: 20px 20px;
+}
+
+.yearsList>li:hover{
+  cursor: pointer;
+}
+
+.sectionFilter{
+  width: 15%;
+  background-color: #0d132b;
+}
+
+.containerMovies {
+  width: 85%;
+  background-color: #0f121d;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 30px;
+}
+
+.target{
+  position: relative;
+  width: 200px;
+  margin: 40px;
+  color: white;
+  transition: all 300ms;
+}
+
+.target:hover{
+  transform: scale(1.1);
+  cursor: pointer;
+  filter: blur(1.5px);
+}
+
+.target .imageMovie{
+  width: 100%;
+  height: 95%;
+  object-fit: cover;
+  border-radius: 8%;
+}
+
+.target .yearMovie{
+  width: 50px;
+  background-color: #0179fc;
+  position: absolute;
+  transform: translate(-50% -50%);
+  right: 8%;
+  top: 85%;
+  font-size: 15pt;
+  text-align: center;
+  border-radius: 20%;
+}
+
+.target .nameMovie{
+  width: 100%;
+  text-align: center;
+  font-size: 15pt;
+  margin: 0;
+}
+
+.footerSeccion{
+  width: 100%;
+  background-color: #141a32;
+  font-size: 18pt;
+  color: white;
+  padding: 40px;
+}
+
+.footerSeccion>.one{
+  color: #7bd828;
+}
+@media screen and (max-width: 1024px){
+
+}
