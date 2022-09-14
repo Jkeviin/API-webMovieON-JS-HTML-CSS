@@ -156,7 +156,6 @@ main{
 .target:hover{
   transform: scale(1.1);
   cursor: pointer;
-  filter: blur(1.5px);
 }
 
 .target .imageMovie{
@@ -198,4 +197,40 @@ main{
 }
 @media screen and (max-width: 1024px){
 
+}
+
+/* ------------------------------------------------ */
+
+#cargando{
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: 50% 50% no-repeat rgba(44, 44, 44, 0.521);
+  opacity: .8;
+}
+
+.icono{
+  /* centrar */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  border: 10px solid rgba(228, 228, 228, 0.959);
+  border-top: 10px solid #666;
+  border-radius: 50%;
+  animation-name: girar;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+@keyframes girar {
+from {
+  transform: rotate(0deg);
+}
+to {
+  transform: rotate(360deg);
+}
 }

@@ -6,7 +6,6 @@ const filtroGenero = document.querySelector('.genderFilter');
 
 // evento inicial
 window.addEventListener("DOMContentLoaded", () => {
-  Genero("movie");
   SearchTrending("all")
 });
 
@@ -15,12 +14,29 @@ NavBar.forEach(nav => {
   nav.addEventListener('click', () => {
     NavBar.forEach(nav => nav.classList.remove('active'));
     nav.classList.add('active');
-    if (nav.id === 'book') {
-      SearchBook("programacion")
-    } else {
-      SearchTrending(nav.id);
-      Genero(nav.id);
+
+    switch (nav.id) {
+      case 'book':
+        SearchBook("programacion")
+        break;
+      case 'all':
+        SearchTrending(nav.id);
+        filtroGenero.innerHTML = `  <h3>GÉNERO</h3>
+        <li>Animación</li>
+        <li>Comedia</li>
+        <li>Crimen</li>
+        <li>Documental</li>
+        <li>Drama</li>
+        <li>Familia</li>
+        <li>Misterio</li>
+        <li>Western</li>`
+        break;
+      default:
+        SearchTrending(nav.id);
+        Genero(nav.id);
+        break;
     }
+
     // limpiar input
     input_search.value = '';
     // cambiar atributo categoria de search
@@ -59,28 +75,49 @@ const options = {
 
 //* ///////// Buscar ///////////// *//
 
-// Buscar Populares
-const SearchTrending = (type) => {
-  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&page=1`;
+const SearchGenres = (type, id) => {
+  const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=${id}`;
+  document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
     .then(data => Show(data))
     .catch(error => console.log(error))
+    .finally(() => {
+      document.getElementById("cargando").style.display = "none";
+  });
+}
+
+// Buscar Populares
+const SearchTrending = (type) => {
+  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&page=1`;
+  document.getElementById("cargando").style.display = "block";
+  fetch(URL, options)
+    .then(response => response.json())
+    .then(data => Show(data))
+    .catch(error => console.log(error))
+    .finally(() => {
+      document.getElementById("cargando").style.display = "none";
+  });
 }
 
 // Peliculas || Series || all
 const search = (type) => {
-  const busqueda = input_search.value
+  const busqueda = input_search.value;
   const URL = `https://api.themoviedb.org/3/search/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&query=${busqueda}&page=1&include_adult=false`;
+  document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
     .then(data => Show(data))
     .catch(error => console.log(error))
+    .finally(() => {
+      document.getElementById("cargando").style.display = "none";
+  });
 }
 
 // Buscar libros
 const SearchBook = (search) => {
   const URL = `https://www.googleapis.com/books/v1/volumes?q=${search}&maxResults=20&langRestrict=es`;
+  document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
     .then(data => {
@@ -92,6 +129,9 @@ const SearchBook = (search) => {
       ShowBook(data)
     })
     .catch(error => console.log(error))
+    .finally(() => {
+      document.getElementById("cargando").style.display = "none";
+  });
 }
 
 //* ///////////// Mostrar //////////////
@@ -101,7 +141,6 @@ const Show = (data) => {
   const movies = data.results
   moviesContainer.innerHTML = ''
   movies.forEach(movie => {
-    // redondear calificacion
     if (movie.poster_path && movie.media_type !== "person") {
       const vote = movie.vote_average.toFixed(1)
       const titulo = movie.title ? movie.title : movie.name;
@@ -131,9 +170,11 @@ const ShowBook = (data) => {
 
 // Mostrar generos
 const Genero = (type) => {
+  document.getElementById("cargando").style.display = "block";
   fetch(`https://api.themoviedb.org/3/genre/${type}/list?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX`, options)
     .then(response => response.json())
     .then(data => {
+      console.log(data)
       const generos = data.genres
       filtroGenero.innerHTML = '<h3>GÉNERO</h3>'
       generos.forEach(genero => {
@@ -143,17 +184,25 @@ const Genero = (type) => {
         `
       });
     })
+    .catch(error => console.log(error))
+    .finally(() => {
+      document.getElementById("cargando").style.display = "none";
+  });
 }
 
 
 
 // filtrar por genero
 const filterGender = () => {
+  document.getElementById("cargando").style.display = "block";
   fetch(`https://api.themoviedb.org/3/discover/movie?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=48`, options)
     .then(response => response.json())
     .then(data => {
       console.log(data)
-    }
-    )
+    })
+    .catch(error => console.log(error))
+    .finally(() => {
+      document.getElementById("cargando").style.display = "none";
+  });
 }
 filterGender()
