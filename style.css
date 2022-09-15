@@ -131,8 +131,8 @@ main{
   border-color: #cccccc22;
 }
 
-.yearFilter{
-  width: 100%;
+.yearFilter{ 
+  width: 85%;
   margin: 20px;
 }
 
