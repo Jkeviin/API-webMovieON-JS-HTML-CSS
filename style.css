@@ -11,7 +11,7 @@ body{
 
 header{
   width: 100%;
-  height: 125px;
+  height: 80px;
   background-color: #141a32;
   display: flex;
   justify-content: space-around;
@@ -19,15 +19,19 @@ header{
   font-size: 22pt;
   align-items: center;
   z-index: 20;
+  position: fixed;
+  top: 0;
 }
 
 header>h1{
   cursor: default;
+  font-size: 150%;
 }
 
 header>a{
   text-decoration: none;
   color: white;
+  font-size: 18pt;
 }
 
 header>a:hover{
@@ -35,7 +39,7 @@ header>a:hover{
 }
 
 .active {
-  color: #ffe100;
+  color: #ffe100 !important;
 }
 
 header>hr{
@@ -44,16 +48,17 @@ header>hr{
 
 header> .filterSearch{
   width: 200px;
-  height: 50px;
+  height: 45px;
   position: relative;
   border: 1px solid gray;
   border-radius: 20px;
-  background-color: rgba(137, 137, 137, 0.443);
+  background-color: rgba(137, 137, 137, 0.308);
 }
 
 .filterSearch>i{
   position: absolute;
   transform: translateX(-50%) translateY(-50%);
+  color: rgba(255, 255, 255, 0.587);
   top: 50%;
   left: 10%;
   font-size: 12pt;
@@ -72,35 +77,47 @@ header> .filterSearch{
   font-size: 15pt;
 }
 
+.btns{
+  display: flex;
+  justify-content: center;
+  align-items: center;;
+}
+
+.containers {
+  width: 85%;
+    /* centrar */
+    justify-items: center;
+    padding: 30px;
+    padding-bottom: 100px;
+      background-color: #0f121d;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+}
+
 main{
   display: flex;
   top: 125px;
   width: 100%;
-}
-
-.sectionFilter{
-  color: white;
+  padding-top: 80px;
 }
 
 .genderFilter{
   width: 100%;
-  margin: 30px;
+  margin: 25px;
 }
 
 .genderFilter>h3{
-  font-size: 19pt;
+  font-size: 2vh;
 }
+
 
 .genderFilter>li{
   width: auto;
-  font-size: 14pt;
-  margin: 5px 20px;
-}
-
-.genderFilter>li{
-  width: auto;
-  font-size: 14pt;
-  margin: 20px 20px;
+  font-size: 13pt;
+  margin: 20px 0 20px 20px;
   color: #cccccc;
 }
 
@@ -108,9 +125,15 @@ main{
   cursor: pointer;
 }
 
+.lnfilter{
+  width: 90%;
+  margin: 10px;
+  border-color: #cccccc22;
+}
+
 .yearFilter{
   width: 100%;
-  margin: 30px;
+  margin: 20px;
 }
 
 .yearFilter .yearsList{
@@ -119,13 +142,14 @@ main{
 }
 
 .yearFilter>h3{
-  font-size: 19pt;
+  font-size: 2vh;
+
 }
 
 .yearsList>li{
   width: auto;
-  font-size: 14pt;
-  margin: 20px 20px;
+  font-size: 13pt;
+  margin: 20px 0px 12px 18px;
 }
 
 .yearsList>li:hover{
@@ -133,21 +157,32 @@ main{
 }
 
 .sectionFilter{
+  color: white;
   width: 15%;
   background-color: #0d132b;
 }
 
 .containerMovies {
-  width: 85%;
-  background-color: #0f121d;
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   grid-gap: 30px;
 }
 
+.error{
+  width: 100%;
+  height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 50pt;
+  color: white;
+}
+
 .target{
   position: relative;
   width: 200px;
+  height: 300px;
   margin: 40px;
   color: white;
   transition: all 300ms;
@@ -185,16 +220,38 @@ main{
 }
 
 .footerSeccion{
+  display: flex;
+  justify-content:space-between;
+  align-items: center;
   width: 100%;
+  height: 120px;
   background-color: #141a32;
-  font-size: 18pt;
   color: white;
-  padding: 40px;
+  padding: 40px 15px 40px 15px;
 }
 
-.footerSeccion>.one{
+.footerSeccion .footerInfo{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.footerSeccion .footerLogo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25pt;
+  margin-right: 30px;
+  width: 220px;
+  height: 100px;
+
+}
+
+.footerSeccion .footerInfo>.one{
   color: #7bd828;
 }
+
 @media screen and (max-width: 1024px){
 
 }

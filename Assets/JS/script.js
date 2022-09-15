@@ -29,10 +29,13 @@ window.addEventListener("DOMContentLoaded", () => {
 // evento click
 NavBar.forEach(nav => {
   nav.addEventListener('click', () => {
+    document.querySelector('.sectionFilter').style.display = "block";
     NavBar.forEach(nav => nav.classList.remove('active'));
     nav.classList.add('active');
     switch (nav.id) {
       case 'book':
+        document.querySelector('.sectionFilter').style.display = "none";
+        document.querySelector('.containerMovies').style.width = "100%";
         SearchBook("programacion")
         break;
       case 'all':
@@ -50,7 +53,8 @@ NavBar.forEach(nav => {
         break;
       default:
         SearchTrending(nav.id);
-        Genero(nav.id);
+        SearchGeneroList(nav.id);
+        eventClickGener();
         break;
     }
     // limpiar input
@@ -68,6 +72,8 @@ const eventClickGener = () =>{
   const Geners = document.querySelectorAll('.generos');
   Geners.forEach(genero => {
     genero.addEventListener('click', () => {
+      Geners.forEach(genero => genero.classList.remove('active'));
+      genero.classList.add('active');
       if(input_search.getAttribute('category') === 'all'){
         JuntarSearch("movie", "tv", genero.id);
       }
@@ -80,6 +86,7 @@ const eventClickGener = () =>{
       GenerActual = genero.id;
     });
   });
+
 }
 
 // eventos keyup
@@ -100,6 +107,17 @@ input_search.addEventListener("keyup", () => {
 
 
 //* ///////// Buscar ///////////// *//
+
+const SearchGeneroList = (type) => {
+  document.getElementById("cargando").style.display = "block";
+  fetch(`https://api.themoviedb.org/3/genre/${type}/list?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&include_adult=false`, options)
+    .then(response => response.json())
+    .then(data => ShowGeneroList(data.genres))
+    .catch(error => console.log(error))
+    .finally(() => {
+      document.getElementById("cargando").style.display = "none";
+  });
+}
 
 const SearchGenres = (type, id) => {
   const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&include_video=false&page=1&with_genres=${id}&include_adult=false`;
@@ -130,7 +148,6 @@ const SearchTrending = (type) => {
 const search = (type, genero) => {
   const busqueda = input_search.value;
   const URL = `https://api.themoviedb.org/3/search/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&query=${busqueda}&page=1&include_adult=false${genero === "" ? "" : "&with_genres=" + genero}`;
-  console.log(URL);
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -149,7 +166,7 @@ const SearchBook = (search) => {
     .then(response => response.json())
     .then(data => {
       if (data.totalItems === 0) {
-        moviesContainer.innerHTML = '<h1>No se encontraron resultados</h1>'
+        moviesContainer.innerHTML = '<h1 class="error">No se encontraron resultados</h1>'
         return;
       }
       ShowBook(data)
@@ -178,7 +195,7 @@ const Show = (data) => {
     }
   });
   if(moviesContainer.innerHTML === ''){
-    moviesContainer.innerHTML = '<h1>No se encontraron resultados</h1>'
+    moviesContainer.innerHTML = '<h1 class="error">No se encontraron resultados</h1>'
   }
 }
 
@@ -225,25 +242,16 @@ const JuntarSearch = (type1, type2, id) => {
       });
   }
 /* ------------------------------------------------------------- */
+
 // Mostrar generos
-const Genero = (type) => {
-  document.getElementById("cargando").style.display = "block";
-  fetch(`https://api.themoviedb.org/3/genre/${type}/list?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&include_adult=false`, options)
-    .then(response => response.json())
-    .then(data => {
-      const generos = data.genres
-      filtroGenero.innerHTML = '<h3>GÉNERO</h3>'
-      generos.forEach(genero => {
-        // se puede modificar solo para 8 generos
-        filtroGenero.innerHTML += `
-          <li class="genero" onclick="SearchGenres('${input_search.getAttribute("category")}', ${genero.id})">${genero.name}</li>
-        `
-      });
-      eventClickGener();
-    })
-    .catch(error => console.log(error))
-    .finally(() => {
-      document.getElementById("cargando").style.display = "none";
+const ShowGeneroList = (type) => {
+  filtroGenero.innerHTML = '<h3>GÉNERO</h3>'
+  type.forEach(genero => {
+    // se puede modificar solo para 8 generos
+    filtroGenero.innerHTML += `
+      <li class="generos" onclick="SearchGenres('${input_search.getAttribute("category")}', ${genero.id})">${genero.name}</li>
+    `
   });
+  eventClickGener();
 }
 

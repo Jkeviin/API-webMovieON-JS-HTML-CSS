@@ -20,7 +20,7 @@
     <a href="#" class="Options" id="book">LIBROS</a>
     <div class="filterSearch">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="search" category="all" placeholder="Busca all">
+      <input type="text" id="search" category="all" placeholder="Busca all" autocomplete="off">
     </div>
   </header>
   <main>
@@ -36,6 +36,7 @@
         <li class="generos" id="9648">Misterio</li>
         <li class="generos" id="37">Western</li>
     </ul>
+    <hr class="lnfilter">
     <ul class="yearFilter">
       <h3>AÑO LANZAMIENTO</h3>
       <div class="yearsList">
@@ -50,15 +51,28 @@
       </div>
     </ul>
     </section>
+    <div class="containers">
     <section class="containerMovies">
+        <!-- Aqui se insertan las tarjetas de las peliculas -->
 
+        <!-- Botones next y prev -->
     </section>
+    <div class="btns">
+      <button class="btnPrev" id="btnPrev">Prev</button>
+      <button class="btnNext" id="btnNext">Next</button>
+    </div>
+</div>
   </main>
   <footer>
     <section class="footerSeccion">
-      <p class="one">MARVELDISNEY+DC COMICSAVENTURATERRORSERIESPELICULASESTRENOS</p>
-      <p class="two">MOVIE ON es un servicio de distribucion de peliculas y series gratis. En MOVIE ON no se almacena ningún video, estos se encuentran alojados en sitios de terceros.</p>
-      <p class="three">MOVIE ON. Todos los derechos reservados</p>
+      <div class="footerLogo">
+        <h3>MOVIE ON</h3>
+      </div>
+        <div class="footerInfo">
+          <p class="one">MARVELDISNEY+DC COMICSAVENTURATERRORSERIESPELICULASESTRENOS</p>
+          <p class="two">MOVIE ON es un servicio de distribucion de peliculas y series gratis. En MOVIE ON no se almacena ningún video, estos se encuentran alojados en sitios de terceros.</p>
+          <p class="three">MOVIE ON. Todos los derechos reservados</p>
+        </div>
     </section>
   </footer>
   <div id="cargando" style="display:none" ><div class="icono"></div></div>
