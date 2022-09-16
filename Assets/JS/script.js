@@ -3,9 +3,15 @@ const input_search = document.getElementById("search");
 const moviesContainer = document.querySelector('.containerMovies');
 const NavBar = document.querySelectorAll('.Options');
 const filtroGenero = document.querySelector('.genderFilter');
+const Next = document.getElementById("btnNext");
+const Prev = document.getElementById("btnPrev");
+const contadorPag = document.getElementById("contadorPag");
+const Text_Busqueda = document.querySelector(".text-busqueda");
 
 // variables
 let GenerActual = "";
+let CategActual = "all";
+let PagActual = 1;
 
 // Opciones de busqueda
 const options = {
@@ -22,11 +28,57 @@ const options = {
 
 // evento inicial
 window.addEventListener("DOMContentLoaded", () => {
-  SearchTrending("all");
+  SearchTrending("all", 1);
   eventClickGener();
 });
 
 // evento click
+//click btn Next || Prev
+Next.addEventListener('click', () => {
+
+  if(document.querySelector('.error') == null){
+    // quitar clase disabled
+    Prev.classList.remove('disabled');
+
+    PagActual++;
+    cambiarPagina();
+  }
+});
+
+Prev.addEventListener('click', () => {
+
+  if(PagActual > 1){
+    PagActual--;
+    cambiarPagina();
+    if(PagActual == 1){
+      Prev.classList.add('disabled');
+    }
+  }
+});
+
+const cambiarPagina = () => {
+  contadorPag.innerHTML = PagActual;
+  // Si esta categorizado por genero
+  if(GenerActual == "" && input_search.value == ""){
+    SearchTrending(CategActual, PagActual);
+  }
+  // si esta con un genero activado (comedia, accion, etc) y no esta en la categoria all
+  else if(GenerActual != "" && input_search.value == "" && CategActual !== 'all'){
+    SearchGenres(CategActual, GenerActual, PagActual);
+  }
+  // si esta con un genero activado (comedia, accion, etc) y esta en la categoria all
+  else if(GenerActual != "" && input_search.value == "" && CategActual === 'all'){
+    JuntarSearch("movie", "tv", GenerActual, PagActual);
+  }
+  // si esta en la categoria y esta buscando
+  else if(GenerActual == "" && input_search.value != ""){
+    search(CategActual === "all" ? "multi" : CategActual, GenerActual === "" ? "" : GenerActual, PagActual);
+  }
+  // subir scroll
+  window.scrollTo(0, 0);
+}
+
+// click navbar
 NavBar.forEach(nav => {
   nav.addEventListener('click', () => {
     document.querySelector('.sectionFilter').style.display = "block";
@@ -35,11 +87,13 @@ NavBar.forEach(nav => {
     switch (nav.id) {
       case 'book':
         document.querySelector('.sectionFilter').style.display = "none";
-        document.querySelector('.containerMovies').style.width = "100%";
-        SearchBook("programacion")
+        document.querySelector('.containers').style.width = "100%";
+        document.querySelector('.btns').style.visibility = "hidden";
+        SearchBook("marvel")
         break;
       case 'all':
-        SearchTrending(nav.id);
+        document.querySelector('.btns').style.visibility = "visible";
+        SearchTrending(nav.id, 1);
         filtroGenero.innerHTML = `  <h3>GÉNERO</h3>
         <li class="generos" id="16">Animación</li>
         <li class="generos" id="35">Comedia</li>
@@ -52,7 +106,8 @@ NavBar.forEach(nav => {
         eventClickGener();
         break;
       default:
-        SearchTrending(nav.id);
+        document.querySelector('.btns').style.visibility = "visible";
+        SearchTrending(nav.id, 1);
         SearchGeneroList(nav.id);
         eventClickGener();
         break;
@@ -64,7 +119,12 @@ NavBar.forEach(nav => {
     // cambiar placeholder
     input_search.setAttribute('placeholder', `Buscar ${nav.id}`);
     // Desactivar modo genero
+    CategActual = nav.id;
     GenerActual = "";
+    PagActual = 1;
+    contadorPag.innerHTML = PagActual;
+    Prev.classList.add('disabled');
+    Text_Busqueda.style.display = "none";
   });
 });
 
@@ -72,18 +132,23 @@ const eventClickGener = () =>{
   const Geners = document.querySelectorAll('.generos');
   Geners.forEach(genero => {
     genero.addEventListener('click', () => {
-      Geners.forEach(genero => genero.classList.remove('active'));
-      genero.classList.add('active');
-      if(input_search.getAttribute('category') === 'all'){
-        JuntarSearch("movie", "tv", genero.id);
+      Geners.forEach(genero => genero.classList.remove('active_genero'));
+      genero.classList.add('active_genero');
+      if(CategActual === 'all'){
+        JuntarSearch("movie", "tv", genero.id, 1);
       }
       else{
-      SearchGenres(input_search.getAttribute("category"), genero.id);
+        SearchGenres(CategActual, genero.id, 1);
       }
       //Limpiar input
       input_search.value = '';
       // Activar modo genero
       GenerActual = genero.id;
+      PagActual = 1;
+      contadorPag.innerHTML = PagActual;
+      Text_Busqueda.style.display = "none";
+      Prev.classList.add('disabled');
+      Next.classList.remove('disabled');
     });
   });
 
@@ -92,16 +157,22 @@ const eventClickGener = () =>{
 // eventos keyup
 input_search.addEventListener("keyup", () => {
 
-  if (input_search.value === '') {
-    SearchTrending(document.querySelector('.active').id);
+  if (input_search.value === '' && CategActual !== 'book') {
+    SearchTrending(CategActual, 1);
+    Text_Busqueda.style.display = "none";
     return;
   }
-  if (input_search.getAttribute("category") === "book") {
+  if(input_search.value === '' && CategActual === 'book'){
+    SearchBook("marvel");
+    Text_Busqueda.style.display = "none";
+    return;
+  }
+  if (CategActual === "book") {
     SearchBook(input_search.value);
     return;
   }
 
-  search(input_search.getAttribute("category") === "all" ? "multi" : input_search.getAttribute("category"), GenerActual === "" ? "" : GenerActual);
+  search(CategActual === "all" ? "multi" : CategActual, GenerActual === "" ? "" : GenerActual, 1);
 });
 
 
@@ -119,8 +190,8 @@ const SearchGeneroList = (type) => {
   });
 }
 
-const SearchGenres = (type, id) => {
-  const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&include_video=false&page=1&with_genres=${id}&include_adult=false`;
+const SearchGenres = (type, id, pag) => {
+  const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&include_video=false&page=${pag}&with_genres=${id}&include_adult=false`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -132,8 +203,8 @@ const SearchGenres = (type, id) => {
 }
 
 // Buscar Populares
-const SearchTrending = (type) => {
-  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&page=1&include_adult=false`;
+const SearchTrending = (type, pag) => {
+  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&page=${pag}&include_adult=false`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -145,13 +216,17 @@ const SearchTrending = (type) => {
 }
 
 // Peliculas || Series || all
-const search = (type, genero) => {
+const search = (type, genero, pag) => {
   const busqueda = input_search.value;
-  const URL = `https://api.themoviedb.org/3/search/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&query=${busqueda}&page=1&include_adult=false${genero === "" ? "" : "&with_genres=" + genero}`;
+  const URL = `https://api.themoviedb.org/3/search/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&query=${busqueda}&page=${pag}&include_adult=false${genero === "" ? "" : "&with_genres=" + genero}`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
-    .then(data => Show(data))
+    .then(data => {
+      Show(data)
+      Text_Busqueda.style.display = "block";
+      Text_Busqueda.innerHTML = `Resultados de la búsqueda: <a> {${busqueda}} </a>`;
+    })
     .catch(error => console.log(error))
     .finally(() => {
       document.getElementById("cargando").style.display = "none";
@@ -160,16 +235,18 @@ const search = (type, genero) => {
 
 // Buscar libros
 const SearchBook = (search) => {
-  const URL = `https://www.googleapis.com/books/v1/volumes?q=${search}&maxResults=20&langRestrict=es`;
+  const URL = `https://www.googleapis.com/books/v1/volumes?q=${search}&maxResults=40&langRestrict=es`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
     .then(data => {
       if (data.totalItems === 0) {
-        moviesContainer.innerHTML = '<h1 class="error">No se encontraron resultados</h1>'
+        moviesContainer.innerHTML = '<h1 class="error" style="margin:38vh">No se encontraron resultados</h1>'
         return;
       }
       ShowBook(data)
+      Text_Busqueda.style.display = "block";
+      Text_Busqueda.innerHTML = `Resultados de la búsqueda: <a> {${search}} </a>`;
     })
     .catch(error => console.log(error))
     .finally(() => {
@@ -196,6 +273,9 @@ const Show = (data) => {
   });
   if(moviesContainer.innerHTML === ''){
     moviesContainer.innerHTML = '<h1 class="error">No se encontraron resultados</h1>'
+    document.getElementById("btnNext").classList.add('disabled');
+  }else{
+    document.getElementById("btnNext").classList.remove('disabled');
   }
 }
 
@@ -204,18 +284,24 @@ const ShowBook = (data) => {
   const books = data.items
   moviesContainer.innerHTML = ''
   books.forEach(book => {
+    /* SI el titulo no es tan grande */
+    if (book.volumeInfo.title.length < 60 && book.volumeInfo.imageLinks) {
     moviesContainer.innerHTML += `
       <div class="target">
-          <img class="imageMovie" src="${book.volumeInfo.imageLinks.thumbnail}" alt="${book.volumeInfo.title}">
-      <p class="nameMovie">${book.volumeInfo.title}</p></div>`
+          <img class="imageMovie" style="width:180px; height:250px" src="${book.volumeInfo.imageLinks.thumbnail}" alt="${book.volumeInfo.authors}">
+      <p class="nameMovie" style="font-size: 15px">${book.volumeInfo.title}</p></div>`
+    }
   });
+  if (moviesContainer.innerHTML === '') {
+    moviesContainer.innerHTML = '<h1 class="error" style="margin:38vh">No se encontraron resultados</h1>'
+  }
 }
 
 
 // Juntar busqueda de peliculas y series
-const JuntarSearch = (type1, type2, id) => {
-    const url = `https://api.themoviedb.org/3/discover/${type1}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-ES&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=${id}`;
-    const url2 = `https://api.themoviedb.org/3/discover/${type2}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-ES&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_genres=${id}`;
+const JuntarSearch = (type1, type2, id, pag) => {
+    const url = `https://api.themoviedb.org/3/discover/${type1}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-ES&sort_by=popularity.desc&include_adult=false&include_video=false&page=${pag}&with_genres=${id}`;
+    const url2 = `https://api.themoviedb.org/3/discover/${type2}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-ES&sort_by=popularity.desc&include_adult=false&include_video=false&page=${pag}&with_genres=${id}`;
     fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -249,7 +335,7 @@ const ShowGeneroList = (type) => {
   type.forEach(genero => {
     // se puede modificar solo para 8 generos
     filtroGenero.innerHTML += `
-      <li class="generos" onclick="SearchGenres('${input_search.getAttribute("category")}', ${genero.id})">${genero.name}</li>
+      <li class="generos" onclick="SearchGenres('${CategActual}', ${genero.id})">${genero.name}</li>
     `
   });
   eventClickGener();

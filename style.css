@@ -7,6 +7,8 @@
 
 body{
   position: relative;
+  min-height: 100vh;
+  background: #141a32;
 }
 
 header{
@@ -40,6 +42,10 @@ header>a:hover{
 
 .active {
   color: #ffe100 !important;
+}
+
+.active_genero {
+  color: #ffe10099 !important;
 }
 
 header>hr{
@@ -77,25 +83,57 @@ header> .filterSearch{
   font-size: 15pt;
 }
 
-.btns{
-  display: flex;
-  justify-content: center;
-  align-items: center;;
-}
-
 .containers {
   width: 85%;
-    /* centrar */
-    justify-items: center;
-    padding: 30px;
-    padding-bottom: 100px;
-      background-color: #0f121d;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
+  /* centrar */
+  justify-items: center;
+  padding: 30px;
+  padding-bottom: 10px;
+  background-color: #0f121d;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
 }
+
+.btns{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 20px;
+}
+
+.btns>button{
+  width: 100px;
+  height: 40px;
+  border: none;
+  border-radius: 20px;
+  background-color: #ffe100;
+  color: #141a32;
+  font-size: 15pt;
+  cursor: pointer;
+  margin: 10px;
+}
+
+.btns>button:hover{
+  background-color: #141a32;
+  color: #ffe100;
+}
+
+.btns .disabled{
+  /* Opaca */
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #141a32;
+  color: #ffe100;
+}
+
+.btns>#contadorPag{
+  font-size: 15pt;
+  color: white;
+}
+
 
 main{
   display: flex;
@@ -160,6 +198,20 @@ main{
   color: white;
   width: 15%;
   background-color: #0d132b;
+  min-height: 79vh;
+}
+
+.text-busqueda{
+  font-size: 15pt;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-busqueda a{
+/* Colorido */
+  color: #ffe100;
 }
 
 .containerMovies {
@@ -167,11 +219,12 @@ main{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   grid-gap: 30px;
+  justify-items: center;
 }
 
 .error{
   width: 100%;
-  height: 50vh;
+  height: 1vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -180,6 +233,10 @@ main{
 }
 
 .target{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   position: relative;
   width: 200px;
   height: 300px;
