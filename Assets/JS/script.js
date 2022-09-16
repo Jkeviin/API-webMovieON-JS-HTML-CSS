@@ -7,11 +7,14 @@ const Next = document.getElementById("btnNext");
 const Prev = document.getElementById("btnPrev");
 const contadorPag = document.getElementById("contadorPag");
 const Text_Busqueda = document.querySelector(".text-busqueda");
+const modal = document.querySelector('.modal');
+const closeModal = document.querySelector('.modal__close');
 
 // variables
 let GenerActual = "";
 let CategActual = "all";
 let PagActual = 1;
+let estado = false;
 
 // Opciones de busqueda
 const options = {
@@ -137,7 +140,7 @@ const eventClickGener = () =>{
       if(CategActual === 'all'){
         JuntarSearch("movie", "tv", genero.id, 1);
       }
-      else{
+      if (CategActual !== 'all') {
         SearchGenres(CategActual, genero.id, 1);
       }
       //Limpiar input
@@ -171,11 +174,12 @@ input_search.addEventListener("keyup", () => {
     SearchBook(input_search.value);
     return;
   }
-
+  
+  /* remover .active_genero */
+  const Geners = document.querySelectorAll('.generos');
+  Geners.forEach(genero => genero.classList.remove('active_genero'));
   search(CategActual === "all" ? "multi" : CategActual, GenerActual === "" ? "" : GenerActual, 1);
 });
-
-
 
 //* ///////// Buscar ///////////// *//
 
@@ -191,7 +195,7 @@ const SearchGeneroList = (type) => {
 }
 
 const SearchGenres = (type, id, pag) => {
-  const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&include_video=false&page=${pag}&with_genres=${id}&include_adult=false`;
+  const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&page=${pag}&with_genres=${id}&include_adult=false`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -204,7 +208,7 @@ const SearchGenres = (type, id, pag) => {
 
 // Buscar Populares
 const SearchTrending = (type, pag) => {
-  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&page=${pag}&include_adult=false`;
+  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&page=${pag}&include_adult=false`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -226,6 +230,12 @@ const search = (type, genero, pag) => {
       Show(data)
       Text_Busqueda.style.display = "block";
       Text_Busqueda.innerHTML = `Resultados de la búsqueda: <a> {${busqueda}} </a>`;
+
+      //subir scroll
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     })
     .catch(error => console.log(error))
     .finally(() => {
@@ -260,15 +270,23 @@ const SearchBook = (search) => {
 const Show = (data) => {
   const movies = data.results
   moviesContainer.innerHTML = ''
+  console.log(data)
   movies.forEach(movie => {
-    if (movie.poster_path && movie.media_type !== "person") {
-      const vote = movie.vote_average.toFixed(1)
-      const titulo = movie.title ? movie.title : movie.name;
+    const vote = movie.vote_average.toFixed(1);
+    const img = movie.poster_path ? movie.poster_path : movie.backdrop_path;
+    if (img && movie.media_type !== "person") {
+      let titulo = movie.title == 'undefined' || movie.title == null ? movie.name : movie.title;
+      console.log(movie.media_type)
       moviesContainer.innerHTML += `
-      <div class="target">
-          <img class="imageMovie" src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
+      <div class="target" id=${movie.id} onclick="ShowInfo(${movie.id}, '${CategActual == 'all' ? movie.media_type : CategActual}', '${movie.vote_average =='undefined' ? 'Sin votos' : movie.vote_average}', '${movie.release_date ? movie.release_date : movie.first_air_date}', '${titulo}', '${movie.popularity}')">
+          <img class="imageMovie" src="https://image.tmdb.org/t/p/w500${img}" alt="La pelicula no tiene imagen">
           <p class="yearMovie">${vote}</p>
-      <p class="nameMovie">${titulo}</p></div>`
+      <p class="nameMovie">${titulo}</p></div>
+      `
+
+      document.getElementById("review").innerHTML += `
+      <div id='escondido_${movie.id}'>${movie.overview != "" ? movie.overview : "Sin descripción"}</div>
+    `
     }
   });
   if(moviesContainer.innerHTML === ''){
@@ -300,8 +318,8 @@ const ShowBook = (data) => {
 
 // Juntar busqueda de peliculas y series
 const JuntarSearch = (type1, type2, id, pag) => {
-    const url = `https://api.themoviedb.org/3/discover/${type1}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-ES&sort_by=popularity.desc&include_adult=false&include_video=false&page=${pag}&with_genres=${id}`;
-    const url2 = `https://api.themoviedb.org/3/discover/${type2}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-ES&sort_by=popularity.desc&include_adult=false&include_video=false&page=${pag}&with_genres=${id}`;
+    const url = `https://api.themoviedb.org/3/discover/${type1}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-MX&include_adult=false&page=${pag}&with_genres=${id}`;
+    const url2 = `https://api.themoviedb.org/3/discover/${type2}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-MX&include_adult=false&page=${pag}&with_genres=${id}`;
     fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -316,17 +334,26 @@ const JuntarSearch = (type1, type2, id, pag) => {
             moviesContainer.innerHTML = '';
             movies.forEach(movie => {
               const { title, name, poster_path, vote_average, id } = movie;
+              const img = movie.poster_path ? movie.poster_path : movie.backdrop_path;
               if(poster_path){
-                moviesContainer.innerHTML += `
-                <div class="target">
-                <img class="imageMovie" src="https://image.tmdb.org/t/p/w500${poster_path}" alt="${title ? title : name}">
-                <p class="yearMovie">${vote_average}</p>
-                <p class="nameMovie">${title ? title : name}</p></div>`
-              }
+                  moviesContainer.innerHTML += `
+                  <div class="target" id=${id} onclick="alerta()">
+                      <img class="imageMovie" src="https://image.tmdb.org/t/p/w500${img}" alt="La pelicula no tiene imagen">
+                      <p class="yearMovie">${vote_average}</p>
+                  <p class="nameMovie">${title ? title : name}</p></div>`
+                }
+                document.getElementById("review").innerHTML += `
+                  <div id='escondido_${id}'>${movie.overview != "" ? movie.overview : "Sin descripción"}</div>
+                `
             });
           });
       });
   }
+
+  const alerta = () => {
+    alert("No se puede mostrar la información de esta pelicula o serie, debes elegir una categoria")
+  }
+
 /* ------------------------------------------------------------- */
 
 // Mostrar generos
@@ -335,9 +362,50 @@ const ShowGeneroList = (type) => {
   type.forEach(genero => {
     // se puede modificar solo para 8 generos
     filtroGenero.innerHTML += `
-      <li class="generos" onclick="SearchGenres('${CategActual}', ${genero.id})">${genero.name}</li>
+      <li class="generos" id="${genero.id}">${genero.name}</li>
     `
   });
   eventClickGener();
 }
 
+const ShowInfo = (id, type, vote, date, name, popularity) => {
+  const url = `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-MX`;
+  console.log(url)
+  fetch(url, options)
+    .then(response => response.json())
+    .then(data => {
+      if(data.results.length === 0){
+        alert('No hay trailer disponible')
+        return;
+      }
+      VerModal(data.results, vote, date, name, popularity, id);
+    })
+    .catch(error => console.log(error))
+}
+
+const VerModal = (data, vote_average, release_date, name, popularity, idmovie) => {
+
+  console.log(data, vote_average, release_date, name, popularity, idmovie);
+
+  modal.classList.add('modal--show');
+  const video = data[data.length-1].key
+  const iframe = document.getElementById('iframe')
+  iframe.src = `https://www.youtube.com/embed/${video}?autoplay=1&loop=1&playlist=${video}`
+  const titleModal = document.querySelector('.modal__title');
+  titleModal.innerHTML = name;
+  const reviewModal = document.querySelector('.modal__paragraph');
+  reviewModal.innerHTML = document.getElementById(`escondido_${idmovie}`).innerHTML;
+  const voteModal = document.querySelector('.modal__votos--p');
+  voteModal.innerHTML = vote_average;
+  const dateModal = document.querySelector('.modal__date--p');
+  dateModal.innerHTML = release_date;
+  const popularityModal = document.querySelector('.modal__popularity--p');
+  popularityModal.innerHTML = popularity;
+}
+
+closeModal.addEventListener('click', (e)=>{
+    e.preventDefault();
+    modal.classList.remove('modal--show');
+    const iframe = document.getElementById('iframe')
+    iframe.src = ''
+});

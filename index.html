@@ -60,10 +60,10 @@
     </section>
     <!-- Botones next y prev -->
     <div class="btns">
-      <button class="btnPrev disabled" id="btnPrev">Prev</button>
+      <button class="btnPrev disabled" id="btnPrev">Atras</button>
       <!-- Pagina Actual -->
       <div id="contadorPag">1</div>
-      <button class="btnNext" id="btnNext">Next</button>
+      <button class="btnNext" id="btnNext">Siguiente</button>
     </div>
 </div>
   </main>
@@ -79,6 +79,35 @@
         </div>
     </section>
   </footer>
+  <!-- MODAL para visualizar video pelicula -->
+  <section class="modal">
+    <div class="modal__container">
+      <iframe id="iframe" src="" frameborder="0" allowfullscreen allow="accelerometer; clipboard-write; gyroscope; picture-in-picture; autoplay; encrypted-media" width="560" height="315"></iframe> 
+        <h3 class="modal__title"></h3>
+        <p class="modal__paragraph"></p>
+        <div class="modal__details">
+            <!-- Votos -->
+            <div class="modal__votos">
+              <i class="fa-solid fa-star"></i>
+              <p class="modal__votos--p"></p>
+            </div>
+            <!-- Date -->
+            <div class="modal__date">
+              <i class="fa-solid fa-calendar"></i>
+              <p class="modal__date--p"></p>
+            </div>
+            <!-- Popularity -->
+            <div class="modal__popularity">
+              <i class="fa-solid fa-chart-line"></i>
+              <p class="modal__popularity--p"></p>
+            </div>
+        </div>
+        <a href="#" class="modal__close">Cerrar Modal</a>
+    </div>
+</section>
+
+<div hidden id="review"></div>
+  <!-- icono cargando -->
   <div id="cargando" style="display:none" ><div class="icono"></div></div>
 <script src="./Assets/JS/script.js"></script>
 <script src="https://kit.fontawesome.com/54ad13b3a7.js" crossorigin="anonymous"></script>
