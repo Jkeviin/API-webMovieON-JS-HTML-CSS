@@ -169,29 +169,70 @@ main{
   border-color: #cccccc22;
 }
 
-.yearFilter{ 
-  width: 85%;
-  margin: 20px;
+.containerLenguage{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
 }
 
-.yearFilter .yearsList{
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
+.container-select{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 10px;
 }
 
-.yearFilter>h3{
-  font-size: 2vh;
-
+.Lenguaje_Actual{
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 10px;
 }
 
-.yearsList>li{
-  width: auto;
+.Lenguaje{
+  color: #cccccc;
+  width: 80%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.Lenguaje a{
+  text-decoration: none;
+  /* claro */
+  color: #ffe100;
   font-size: 13pt;
-  margin: 20px 0px 12px 18px;
 }
 
-.yearsList>li:hover{
+select {
+  width: 70%;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+  background-color: #ffe10061;
+  color: #141a32;
+  font-size: 15pt;
   cursor: pointer;
+  padding: 5px;
+}
+
+select:hover{
+  background-color: #141a32;
+  color: #ffe100;
+}
+
+select option{
+  background-color: #141a32;
+  color: #ffe100;
+  padding: 5px;
 }
 
 .sectionFilter{

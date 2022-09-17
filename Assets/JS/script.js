@@ -9,13 +9,17 @@ const contadorPag = document.getElementById("contadorPag");
 const Text_Busqueda = document.querySelector(".text-busqueda");
 const modal = document.querySelector('.modal');
 const closeModal = document.querySelector('.modal__close');
+const lenguajes = document.querySelector('#LENGUAJES');
 
 // variables
 let GenerActual = "";
 let CategActual = "all";
 let PagActual = 1;
 let estado = false;
+let idioma = 'es-MX';
+const web = () => {
 
+}
 // Opciones de busqueda
 const options = {
   method: 'GET',  // Identificar tipo de envio
@@ -31,15 +35,20 @@ const options = {
 
 // evento inicial
 window.addEventListener("DOMContentLoaded", () => {
+  inicio();
+  createOptionsLanguajes();
+});
+
+const inicio = () => {
   SearchTrending("all", 1);
   eventClickGener();
-});
+}
 
 // evento click
 //click btn Next || Prev
 Next.addEventListener('click', () => {
 
-  if(document.querySelector('.error') == null){
+  if (document.querySelector('.error') == null) {
     // quitar clase disabled
     Prev.classList.remove('disabled');
 
@@ -50,31 +59,88 @@ Next.addEventListener('click', () => {
 
 Prev.addEventListener('click', () => {
 
-  if(PagActual > 1){
+  if (PagActual > 1) {
     PagActual--;
     cambiarPagina();
-    if(PagActual == 1){
+    if (PagActual == 1) {
       Prev.classList.add('disabled');
     }
   }
 });
 
+// crear opciones lenguajes
+const createOptionsLanguajes = () => {
+  fetch(`https://api.themoviedb.org/3/configuration/languages?api_key=80d3d3959ac69af0ed72952812957afc`, options)
+    .then(response => response.json())
+    .then(data => {
+      let i = 0;
+      data.forEach(element => {
+        // dejar los mas importantes
+        if (element.iso_639_1 == 'es' || element.iso_639_1 == 'en' || element.iso_639_1 == 'fr' || element.iso_639_1 == 'de' || element.iso_639_1 == 'it' || element.iso_639_1 == 'pt' || element.iso_639_1 == 'ru' || element.iso_639_1 == 'ja' || element.iso_639_1 == 'zh') {
+
+          const pais = ["US", "FR", "DE", "IT", "JP", "CN", "PT", "RU", "MX"];
+            let option = document.createElement('option');
+            option.value = element.iso_639_1 + "-" + pais[i];
+            option.innerHTML = element.english_name;
+            lenguajes.appendChild(option);
+            i++;
+            }
+
+        //ordernalo alfabeticamente
+        data.sort(function (a, b) {
+          if (a.english_name < b.english_name) { return -1; }
+          if (a.english_name > b.english_name) { return 1; }
+          return 0;
+        });
+      });
+      document.querySelector('.Lenguaje_Actual').innerHTML +=
+      `<h5 class="Lenguaje">Lenguaje Actual: <a>${idioma}</></h5>`;
+      // crear evento click lenguajes
+      lenguajes.addEventListener('change', () => {
+        idioma = lenguajes.value;
+        reiniciar();
+        inicio();
+        Next.classList.remove('disabled');
+        switch (CategActual) {
+          case 'movie':
+          case 'tv':
+            SearchGeneroList(CategActual);
+            eventClickGener();
+            break;
+        }
+
+        document.querySelector('.Lenguaje_Actual').innerHTML =
+        `<h5 class="Lenguaje">Lenguaje Actual: <a>${idioma}</></h5>`;
+      });
+    })
+}
+
+const reiniciar = () => {
+  document.getElementById("review").innerHTML = "";
+  input_search.value = '';
+  PagActual = 1;
+  Text_Busqueda.style.display = "none";
+  contadorPag.innerHTML = PagActual;
+  Prev.classList.add('disabled');
+}
+
+
 const cambiarPagina = () => {
   contadorPag.innerHTML = PagActual;
   // Si esta categorizado por genero
-  if(GenerActual == "" && input_search.value == ""){
+  if (GenerActual == "" && input_search.value == "") {
     SearchTrending(CategActual, PagActual);
   }
   // si esta con un genero activado (comedia, accion, etc) y no esta en la categoria all
-  else if(GenerActual != "" && input_search.value == "" && CategActual !== 'all'){
+  else if (GenerActual != "" && input_search.value == "" && CategActual !== 'all') {
     SearchGenres(CategActual, GenerActual, PagActual);
   }
   // si esta con un genero activado (comedia, accion, etc) y esta en la categoria all
-  else if(GenerActual != "" && input_search.value == "" && CategActual === 'all'){
+  else if (GenerActual != "" && input_search.value == "" && CategActual === 'all') {
     JuntarSearch("movie", "tv", GenerActual, PagActual);
   }
   // si esta en la categoria y esta buscando
-  else if(GenerActual == "" && input_search.value != ""){
+  else if (GenerActual == "" && input_search.value != "") {
     search(CategActual === "all" ? "multi" : CategActual, GenerActual === "" ? "" : GenerActual, PagActual);
   }
   // subir scroll
@@ -108,15 +174,15 @@ NavBar.forEach(nav => {
         <li class="generos" id="37">Western</li>`
         eventClickGener();
         break;
-      default:
+      case 'movie':
+      case 'tv':
         document.querySelector('.btns').style.visibility = "visible";
         SearchTrending(nav.id, 1);
         SearchGeneroList(nav.id);
         eventClickGener();
         break;
     }
-    // limpiar input
-    input_search.value = '';
+    reiniciar();
     // cambiar atributo categoria de search
     input_search.setAttribute('category', nav.id);
     // cambiar placeholder
@@ -124,34 +190,25 @@ NavBar.forEach(nav => {
     // Desactivar modo genero
     CategActual = nav.id;
     GenerActual = "";
-    PagActual = 1;
-    contadorPag.innerHTML = PagActual;
-    Prev.classList.add('disabled');
-    Text_Busqueda.style.display = "none";
   });
 });
 
-const eventClickGener = () =>{
+const eventClickGener = () => {
   const Geners = document.querySelectorAll('.generos');
   Geners.forEach(genero => {
     genero.addEventListener('click', () => {
       Geners.forEach(genero => genero.classList.remove('active_genero'));
       genero.classList.add('active_genero');
-      if(CategActual === 'all'){
+      if (CategActual === 'all') {
         JuntarSearch("movie", "tv", genero.id, 1);
       }
       if (CategActual !== 'all') {
         SearchGenres(CategActual, genero.id, 1);
       }
       //Limpiar input
-      input_search.value = '';
+      reiniciar();
       // Activar modo genero
       GenerActual = genero.id;
-      PagActual = 1;
-      contadorPag.innerHTML = PagActual;
-      Text_Busqueda.style.display = "none";
-      Prev.classList.add('disabled');
-      Next.classList.remove('disabled');
     });
   });
 
@@ -165,7 +222,7 @@ input_search.addEventListener("keyup", () => {
     Text_Busqueda.style.display = "none";
     return;
   }
-  if(input_search.value === '' && CategActual === 'book'){
+  if (input_search.value === '' && CategActual === 'book') {
     SearchBook("marvel");
     Text_Busqueda.style.display = "none";
     return;
@@ -174,7 +231,7 @@ input_search.addEventListener("keyup", () => {
     SearchBook(input_search.value);
     return;
   }
-  
+
   /* remover .active_genero */
   const Geners = document.querySelectorAll('.generos');
   Geners.forEach(genero => genero.classList.remove('active_genero'));
@@ -185,17 +242,17 @@ input_search.addEventListener("keyup", () => {
 
 const SearchGeneroList = (type) => {
   document.getElementById("cargando").style.display = "block";
-  fetch(`https://api.themoviedb.org/3/genre/${type}/list?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&include_adult=false`, options)
+  fetch(`https://api.themoviedb.org/3/genre/${type}/list?api_key=80d3d3959ac69af0ed72952812957afc&language=${idioma}&include_adult=false`, options)
     .then(response => response.json())
     .then(data => ShowGeneroList(data.genres))
     .catch(error => console.log(error))
     .finally(() => {
       document.getElementById("cargando").style.display = "none";
-  });
+    });
 }
 
 const SearchGenres = (type, id, pag) => {
-  const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&page=${pag}&with_genres=${id}&include_adult=false`;
+  const URL = `https://api.themoviedb.org/3/discover/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=${idioma}&sort_by=popularity.desc&page=${pag}&with_genres=${id}&include_adult=false`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -203,12 +260,12 @@ const SearchGenres = (type, id, pag) => {
     .catch(error => console.log(error))
     .finally(() => {
       document.getElementById("cargando").style.display = "none";
-  });
+    });
 }
 
 // Buscar Populares
 const SearchTrending = (type, pag) => {
-  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&page=${pag}&include_adult=false`;
+  const URL = `https://api.themoviedb.org/3/trending/${type}/day?api_key=80d3d3959ac69af0ed72952812957afc&language=${idioma}&sort_by=popularity.desc&page=${pag}&include_adult=false`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -216,13 +273,13 @@ const SearchTrending = (type, pag) => {
     .catch(error => console.log(error))
     .finally(() => {
       document.getElementById("cargando").style.display = "none";
-  });
+    });
 }
 
 // Peliculas || Series || all
 const search = (type, genero, pag) => {
   const busqueda = input_search.value;
-  const URL = `https://api.themoviedb.org/3/search/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=es-MX&sort_by=popularity.desc&query=${busqueda}&page=${pag}&include_adult=false${genero === "" ? "" : "&with_genres=" + genero}`;
+  const URL = `https://api.themoviedb.org/3/search/${type}?api_key=80d3d3959ac69af0ed72952812957afc&language=${idioma}&sort_by=popularity.desc&query=${busqueda}&page=${pag}&include_adult=false${genero === "" ? "" : "&with_genres=" + genero}`;
   document.getElementById("cargando").style.display = "block";
   fetch(URL, options)
     .then(response => response.json())
@@ -240,7 +297,7 @@ const search = (type, genero, pag) => {
     .catch(error => console.log(error))
     .finally(() => {
       document.getElementById("cargando").style.display = "none";
-  });
+    });
 }
 
 // Buscar libros
@@ -261,7 +318,7 @@ const SearchBook = (search) => {
     .catch(error => console.log(error))
     .finally(() => {
       document.getElementById("cargando").style.display = "none";
-  });
+    });
 }
 
 //* ///////////// Mostrar //////////////
@@ -270,15 +327,13 @@ const SearchBook = (search) => {
 const Show = (data) => {
   const movies = data.results
   moviesContainer.innerHTML = ''
-  console.log(data)
   movies.forEach(movie => {
     const vote = movie.vote_average.toFixed(1);
     const img = movie.poster_path ? movie.poster_path : movie.backdrop_path;
     if (img && movie.media_type !== "person") {
       let titulo = movie.title == 'undefined' || movie.title == null ? movie.name : movie.title;
-      console.log(movie.media_type)
       moviesContainer.innerHTML += `
-      <div class="target" id=${movie.id} onclick="ShowInfo(${movie.id}, '${CategActual == 'all' ? movie.media_type : CategActual}', '${movie.vote_average =='undefined' ? 'Sin votos' : movie.vote_average}', '${movie.release_date ? movie.release_date : movie.first_air_date}', '${titulo}', '${movie.popularity}')">
+      <div class="target" id=${movie.id} onclick="ShowInfo(${movie.id}, '${CategActual == 'all' ? movie.media_type : CategActual}', '${movie.vote_average == 'undefined' ? 'Sin votos' : movie.vote_average}', '${movie.release_date ? movie.release_date : movie.first_air_date}', '${titulo}', '${movie.popularity}')">
           <img class="imageMovie" src="https://image.tmdb.org/t/p/w500${img}" alt="La pelicula no tiene imagen">
           <p class="yearMovie">${vote}</p>
       <p class="nameMovie">${titulo}</p></div>
@@ -289,10 +344,10 @@ const Show = (data) => {
     `
     }
   });
-  if(moviesContainer.innerHTML === ''){
+  if (moviesContainer.innerHTML === '') {
     moviesContainer.innerHTML = '<h1 class="error">No se encontraron resultados</h1>'
     document.getElementById("btnNext").classList.add('disabled');
-  }else{
+  } else {
     document.getElementById("btnNext").classList.remove('disabled');
   }
 }
@@ -304,7 +359,7 @@ const ShowBook = (data) => {
   books.forEach(book => {
     /* SI el titulo no es tan grande */
     if (book.volumeInfo.title.length < 60 && book.volumeInfo.imageLinks) {
-    moviesContainer.innerHTML += `
+      moviesContainer.innerHTML += `
       <div class="target">
           <img class="imageMovie" style="width:180px; height:250px" src="${book.volumeInfo.imageLinks.thumbnail}" alt="${book.volumeInfo.authors}">
       <p class="nameMovie" style="font-size: 15px">${book.volumeInfo.title}</p></div>`
@@ -318,41 +373,41 @@ const ShowBook = (data) => {
 
 // Juntar busqueda de peliculas y series
 const JuntarSearch = (type1, type2, id, pag) => {
-    const url = `https://api.themoviedb.org/3/discover/${type1}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-MX&include_adult=false&page=${pag}&with_genres=${id}`;
-    const url2 = `https://api.themoviedb.org/3/discover/${type2}?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-MX&include_adult=false&page=${pag}&with_genres=${id}`;
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        fetch(url2, options)
-          .then(response => response.json())
-          .then(data2 => {
-            const movies = [];
-            for (let i = 0; i < data.results.length; i++) {
-              movies.push(data.results[i]);
-              movies.push(data2.results[i]);
-            }
-            moviesContainer.innerHTML = '';
-            movies.forEach(movie => {
-              const { title, name, poster_path, vote_average, id } = movie;
-              const img = movie.poster_path ? movie.poster_path : movie.backdrop_path;
-              if(poster_path){
-                  moviesContainer.innerHTML += `
+  const url = `https://api.themoviedb.org/3/discover/${type1}?api_key=1f54bd990f1cdfb230adb312546d765d&language=${idioma}&include_adult=false&page=${pag}&with_genres=${id}`;
+  const url2 = `https://api.themoviedb.org/3/discover/${type2}?api_key=1f54bd990f1cdfb230adb312546d765d&language=${idioma}&include_adult=false&page=${pag}&with_genres=${id}`;
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      fetch(url2, options)
+        .then(response => response.json())
+        .then(data2 => {
+          const movies = [];
+          for (let i = 0; i < data.results.length; i++) {
+            movies.push(data.results[i]);
+            movies.push(data2.results[i]);
+          }
+          moviesContainer.innerHTML = '';
+          movies.forEach(movie => {
+            const { title, name, poster_path, vote_average, id } = movie;
+            const img = movie.poster_path ? movie.poster_path : movie.backdrop_path;
+            if (poster_path) {
+              moviesContainer.innerHTML += `
                   <div class="target" id=${id} onclick="alerta()">
                       <img class="imageMovie" src="https://image.tmdb.org/t/p/w500${img}" alt="La pelicula no tiene imagen">
                       <p class="yearMovie">${vote_average}</p>
                   <p class="nameMovie">${title ? title : name}</p></div>`
-                }
-                document.getElementById("review").innerHTML += `
+            }
+            document.getElementById("review").innerHTML += `
                   <div id='escondido_${id}'>${movie.overview != "" ? movie.overview : "Sin descripción"}</div>
                 `
-            });
           });
-      });
-  }
+        });
+    });
+}
 
-  const alerta = () => {
-    alert("No se puede mostrar la información de esta pelicula o serie, debes elegir una categoria")
-  }
+const alerta = () => {
+  alert("Justo ahora no se puede ver la información de un genero de peliculas y series a la vez, por favor espere a que se actualice la pagina");
+}
 
 /* ------------------------------------------------------------- */
 
@@ -369,12 +424,11 @@ const ShowGeneroList = (type) => {
 }
 
 const ShowInfo = (id, type, vote, date, name, popularity) => {
-  const url = `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=1f54bd990f1cdfb230adb312546d765d&language=es-MX`;
-  console.log(url)
+  const url = `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=1f54bd990f1cdfb230adb312546d765d&language=${idioma}`;
   fetch(url, options)
     .then(response => response.json())
     .then(data => {
-      if(data.results.length === 0){
+      if (data.results.length === 0) {
         alert('No hay trailer disponible')
         return;
       }
@@ -385,10 +439,8 @@ const ShowInfo = (id, type, vote, date, name, popularity) => {
 
 const VerModal = (data, vote_average, release_date, name, popularity, idmovie) => {
 
-  console.log(data, vote_average, release_date, name, popularity, idmovie);
-
   modal.classList.add('modal--show');
-  const video = data[data.length-1].key
+  const video = data[data.length - 1].key
   const iframe = document.getElementById('iframe')
   iframe.src = `https://www.youtube.com/embed/${video}?autoplay=1&loop=1&playlist=${video}`
   const titleModal = document.querySelector('.modal__title');
@@ -403,9 +455,9 @@ const VerModal = (data, vote_average, release_date, name, popularity, idmovie) =
   popularityModal.innerHTML = popularity;
 }
 
-closeModal.addEventListener('click', (e)=>{
-    e.preventDefault();
-    modal.classList.remove('modal--show');
-    const iframe = document.getElementById('iframe')
-    iframe.src = ''
+closeModal.addEventListener('click', (e) => {
+  e.preventDefault();
+  modal.classList.remove('modal--show');
+  const iframe = document.getElementById('iframe')
+  iframe.src = ''
 });
